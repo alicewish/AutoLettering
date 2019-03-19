@@ -80,60 +80,60 @@
  *
  * 填字文档范例：
  *
-============分割线============
-## 01
-474,818,0,0,0
-|每个人|
-|都起来!|
+ ============分割线============
+ ## 01
+ 474,818,0,0,0
+ |每个人|
+ |都起来!|
 
-820,895,0,0,0
-出了什么事!?
+ 820,895,0,0,0
+ 出了什么事!?
 
-1324,822,0,0,0
-所有年纪最小的
-都上来,嘿,你!
+ 1324,822,0,0,0
+ 所有年纪最小的
+ 都上来,嘿,你!
 
-1594,836,0,0,0
-其他人,带上
-你们需要的东西,
-然后赶紧跑!
+ 1594,836,0,0,0
+ 其他人,带上
+ 你们需要的东西,
+ 然后赶紧跑!
 
-784,2064,0,0,0
-|啊啊啊啊!|
+ 784,2064,0,0,0
+ |啊啊啊啊!|
 
-921,2130,0,0,0
-|啊啊啊啊!|
+ 921,2130,0,0,0
+ |啊啊啊啊!|
 
-1597,1873,0,0,0
-带他们去
-安全的地方.
+ 1597,1873,0,0,0
+ 带他们去
+ 安全的地方.
 
-## 02
-730,155,0,0,0
-我会
-没事的!
+ ## 02
+ 730,155,0,0,0
+ 我会
+ 没事的!
 
-1665,334,0,0,0
-|快走!|
+ 1665,334,0,0,0
+ |快走!|
 
-235,856,0,0,0
-里碧!我们需要离开!
+ 235,856,0,0,0
+ 里碧!我们需要离开!
 
-1602,851,0,0,0
-|呃啊啊啊!|
+ 1602,851,0,0,0
+ |呃啊啊啊!|
 
-1471,2244,0,0,0
-|艾芙!|
+ 1471,2244,0,0,0
+ |艾芙!|
 
-## 03
-722,155,0,0,0
-里碧,我们必须离开这里!
+ ## 03
+ 722,155,0,0,0
+ 里碧,我们必须离开这里!
 
-1156,1336,0,0,0
-|我知道!|
-|现在救救我!|
+ 1156,1336,0,0,0
+ |我知道!|
+ |现在救救我!|
 
-============分割线============
+ ============分割线============
  *
  *****************************************************************
  *
@@ -306,7 +306,7 @@ function array2meta(text_path) {
     var pageContents = [];
     for (var m = 0; m < pageNumIndexes.length - 1; m++) {
         var thisPage = myLineArray.slice(pageNumIndexes[m] + 1, pageNumIndexes[m + 1]);
-        if (thisPage[0] === '') {
+        if (trim(thisPage[0]) === '') {
             thisPage.shift()
         }
         if (trim(thisPage[thisPage.length - 1]) === '') {
@@ -314,7 +314,6 @@ function array2meta(text_path) {
         }
         // pageContents[m] = thisPage;
         pageContents.push(thisPage);
-
     }
     return pageContents
 }
@@ -487,6 +486,8 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType) {
 
             // The position of origin for the text. The array members specify the X and Y coordinates.
             // Equivalent to clicking the text tool at a point in the document to create the point of origin for text.
+            //文本原点的位置。
+            //等效于用文本工具单击文档中某个点以创建文本的原点。
             textItemRef.position = Array(coorX, coorY);//定位锚点位置
             textItemRef.contents = contents4layer;
         }
