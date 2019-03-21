@@ -193,7 +193,7 @@ var logList = ['提示'];
 var fontName = "MicrosoftYaHei";// 定义字体：微软雅黑
 var fontSize = 30;// 定义字号
 
-var pIgnore = new RegExp("( copy|-)$", "g");
+var pIgnore = new RegExp("( copy|-|填字)$", "g");
 var pLettered = new RegExp("(填字|加框| copy| 拷贝|Whiten)$", "g");
 var pPage = new RegExp("^(## |)\\d{1,4}$", "g");
 
