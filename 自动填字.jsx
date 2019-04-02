@@ -201,6 +201,8 @@ var pCoorColor = new RegExp("^\\d{1,5},\\d{1,5},\\d{1,3},\\d{1,3},\\d{1,3}$", "g
 var pCoor = new RegExp("^\\d{1,5},\\d{1,5}$", "g");
 var pColor = new RegExp("^\\d{1,3},\\d{1,3},\\d{1,3}$", "g");
 var pMeta = new RegExp("^(\\d{1,5},\\d{1,5},\\d{1,3},\\d{1,3},\\d{1,3}|\\d{1,5},\\d{1,5}|\\d{1,3},\\d{1,3},\\d{1,3})$", "g");
+var pComment = new RegExp("^(\\*|译注)", "g");
+
 
 var possibles = ['-7标记.md', '-7标记.txt', '.md', '.txt', '填字.md', '填字.txt', '-填字.md', '-填字.txt', '填.md', '填.txt', '-填.md', '-填.txt',];
 
@@ -444,6 +446,11 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType) {
             textColor.rgb.blue = blue;
 
             var contents4layer = thisBubble.join('\r');
+
+            //================对注释================
+            if (pComment.test(contents4layer) && thisBubble.length === 1) {
+                fontSize = 25
+            }
 
             var artLayerRef = docRef.artLayers.add();//添加图层
             artLayerRef.kind = LayerKind.TEXT;//转为文本图层
