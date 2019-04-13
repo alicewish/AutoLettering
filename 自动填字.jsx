@@ -423,17 +423,17 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType) {
             if (pMeta.test(info_str)) {
                 info_str = thisBubble.shift();
                 var infos = info_str.split(',');
-                if (!pCoorColor.test(info_str)) {
+                if (pCoorColor.test(info_str)) {
                     coorX = parseInt(infos[0]);
                     coorY = parseInt(infos[1]);
 
                     red = parseInt(infos[2]);
                     green = parseInt(infos[3]);
                     blue = parseInt(infos[4]);
-                } else if (!pCoor.test(info_str)) {
+                } else if (pCoor.test(info_str)) {
                     coorX = parseInt(infos[0]);
                     coorY = parseInt(infos[1]);
-                } else if (!pColor.test(info_str)) {
+                } else if (pColor.test(info_str)) {
                     red = parseInt(infos[0]);
                     green = parseInt(infos[1]);
                     blue = parseInt(infos[2]);
@@ -448,8 +448,9 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType) {
             var contents4layer = thisBubble.join('\r');
 
             //================对注释================
+            var thisFontSize = 0;
             if (pComment.test(contents4layer) && thisBubble.length === 1) {
-                fontSize = 25
+                thisFontSize = 25
             }
 
             var artLayerRef = docRef.artLayers.add();//添加图层
@@ -488,7 +489,11 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType) {
             }
 
             textItemRef.color = textColor;//字体颜色
-            textItemRef.size = fontSize; //字号
+            if (thisFontSize > 0) {
+                textItemRef.size = thisFontSize; //字号
+            } else {
+                textItemRef.size = fontSize; //字号
+            }
             textItemRef.font = fontName;
 
             // The position of origin for the text. The array members specify the X and Y coordinates.
