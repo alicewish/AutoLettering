@@ -207,22 +207,23 @@ var pComment = new RegExp("^(\\*|译注)", "g");
 var possibles = ['-7标记.md', '-7标记.txt', '.md', '.txt', '填字.md', '填字.txt', '-填字.md', '-填字.txt', '填.md', '填.txt', '-填.md', '-填.txt',];
 
 //================判断系统================
-var systemOS, mainFolderPath, logInfo;
+var systemOS, mainInputFolders, mainComicPath, mainMangaPath, logInfo;
 
 //在Windows下，路径也必须都用“/”
 if ($.os.search(/windows/i) != -1) {
     systemOS = "windows";
-    mainFolderPath = "C:/Users/alicewish/Dropbox/Data/ComicProcess";
+    mainComicPath = "C:/Users/alicewish/Dropbox/Data/ComicProcess";
+    mainMangaPath = "C:/Users/alicewish/Dropbox/Data/MangaProcess";
 } else {
     systemOS = "macintosh";
-    mainFolderPath = "/Users/alicewish/Dropbox/Data/ComicProcess";
+    mainComicPath = "/Users/alicewish/Dropbox/Data/ComicProcess";
+    mainMangaPath = "/Users/alicewish/Dropbox/Data/MangaProcess";
 }
 
-var mainInputFolder = new Folder(mainFolderPath);
+var mainComicFolder = new Folder(mainComicPath);
+var mainMangaFolder = new Folder(mainMangaPath);
 
-var manga;
-manga = false;
-// manga = true;
+mainInputFolders = [[mainComicFolder, 'Comic'], [mainMangaFolder, 'Manga']];
 
 // alert(systemOS);
 
@@ -280,9 +281,14 @@ function text2array(text_path) {
 
 function findTextPath(currentFolderName) {
     var txtList = [];
+    var text_path;
     for (var t = 0; t < possibles.length; t++) {
         var possible = possibles[t];
-        var text_path = mainFolderPath + '/' + currentFolderName + possible;
+        if (mode === 'Comic') {
+            text_path = mainComicPath + '/' + currentFolderName + possible;
+        } else {
+            text_path = mainMangaPath + '/' + currentFolderName + possible;
+        }
         var myTextFile = new File(text_path);
         if (myTextFile.exists) {
             txtList.push(text_path);
@@ -355,7 +361,7 @@ function meta2bubble(pageContents) {
     return bubbles
 }
 
-function processFolderPic(folderPath, bgFileList, bubbles, inputType) {
+function processFolderPic(folderPath, bgFileList, bubbles, inputType, mode) {
     var outOption = new PhotoshopSaveOptions;
     outOption.embedColorProfile = true;
     outOption.alphaChannels = true;
@@ -407,11 +413,9 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType) {
         //================对每个气泡================
         for (var b = 0; b < bubbleContents.length; b++) {
             var thisBubble = bubbleContents[b];
-
             var info_str = thisBubble[0];
-
             var coorX = width * (b + 1) / (bubbleContents.length + 1);
-            if (manga) {
+            if (mode === 'Manga') {
                 coorX = width - width * (b + 1) / (bubbleContents.length + 1);
             }
             var coorY = height * (b + 1) / (bubbleContents.length + 1);
@@ -483,11 +487,6 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType) {
              * 居中对齐=CENTER
              ********************/
 
-            if (manga) {
-                textItemRef.direction = Direction.VERTICAL; //文本取向
-                textItemRef.justification = Justification.LEFT; //对齐方式
-            }
-
             textItemRef.color = textColor;//字体颜色
             if (thisFontSize > 0) {
                 textItemRef.size = thisFontSize; //字号
@@ -495,6 +494,12 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType) {
                 textItemRef.size = fontSize; //字号
             }
             textItemRef.font = fontName;
+
+            if (mode === 'Manga') {
+                textItemRef.direction = Direction.VERTICAL; //文本取向
+                textItemRef.justification = Justification.LEFT; //对齐方式
+                textItemRef.size = 20; //字号
+            }
 
             // The position of origin for the text. The array members specify the X and Y coordinates.
             // Equivalent to clicking the text tool at a point in the document to create the point of origin for text.
@@ -509,71 +514,85 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType) {
         //不保存关闭处理后的文件
         bgFile.close(SaveOptions.DONOTSAVECHANGES);
     }
+
 }
 
 //================主体程序================
 
-if (mainInputFolder != null) {
-    var mainFileList = mainInputFolder.getFiles();
-    mainFileList.sort();
+var folderPath;
+for (var x = 0; x < mainInputFolders.length; x++) {
+    var mainInputFolder = mainInputFolders[x][0];
+    var mode = mainInputFolders[x][1];
+    // alert(mainInputFolder);
+    // alert(mode);
+    if (mainInputFolder != null) {
+        var mainFileList = mainInputFolder.getFiles();
+        mainFileList.sort();
 
-    var mainFolderList = [];
-    for (var i = 0; i < mainFileList.length; i++) {
-        var currentFile = mainFileList[i];
-        if (currentFile instanceof Folder && !pIgnore.test(currentFile.displayName)) {
-            mainFolderList.push(currentFile);
+        var mainFolderList = [];
+        for (var i = 0; i < mainFileList.length; i++) {
+            var currentFile = mainFileList[i];
+            if (currentFile instanceof Folder && !pIgnore.test(currentFile.displayName)) {
+                mainFolderList.push(currentFile);
+            }
         }
-    }
+        if (mainFolderList.length === 0) {
+            // alert('无事可做💤');
+        } else {
+            // alert(mainFolderList.length);
+            //================对每个文件夹================
+            for (var j = 0; j < mainFolderList.length; j++) {
+                var currentFolder = mainFolderList[j];
+                // alert(currentFolder);
+                var currentFolderName = currentFolder.displayName;
+                if (mode === 'Comic') {
+                    folderPath = mainComicPath + '/' + currentFolderName;
+                } else {
+                    folderPath = mainMangaPath + '/' + currentFolderName;
+                }
 
-    if (mainFolderList.length === 0)
-        alert('无事可做💤');
-    else {
-        // alert(mainFolderList.length);
-        //================对每个文件夹================
-        for (var j = 0; j < mainFolderList.length; j++) {
-            var currentFolder = mainFolderList[j];
-            var currentFolderName = currentFolder.displayName;
-            var folderPath = mainFolderPath + '/' + currentFolderName;
+                var txtList = findTextPath(currentFolderName, mode);
+                if (txtList.length >= 1) {
+                    logList.push(currentFolderName);
 
-            var txtList = findTextPath(currentFolderName);
-            if (txtList.length >= 1) {
-                logList.push(currentFolderName);
+                    var text_path = txtList[0];
+                    // alert(text_path);
 
-                var text_path = txtList[0];
-                var pageContents = array2meta(text_path);
-                var bubbles = meta2bubble(pageContents);
+                    var pageContents = array2meta(text_path);
+                    var bubbles = meta2bubble(pageContents);
 
-                if (currentFolder != null) {
-                    var jpgList = currentFolder.getFiles("*.jpg");
-                    jpgList.sort();
+                    if (currentFolder != null) {
+                        var jpgList = currentFolder.getFiles("*.jpg");
+                        jpgList.sort();
 
-                    var psdList = currentFolder.getFiles("*.psd");
-                    psdList.sort();
+                        var psdList = currentFolder.getFiles("*.psd");
+                        psdList.sort();
 
-                    var inputType = 'jpg';
+                        var inputType = 'jpg';
 
-                    var bgFileList = [];
-                    for (var p = 0; p < jpgList.length; p++) {
-                        var currentJpg = jpgList[p];
-                        var currentFileName = currentJpg.displayName;
-                        var index = currentFileName.lastIndexOf(".");
-                        var ext = currentFileName.substr(index + 1);
-                        var currentFileStem = currentFileName.split('.').slice(0, -1).join('.');
-                        if (!pLettered.test(currentFileStem)) {
-                            bgFileList.push(currentJpg);
+                        var bgFileList = [];
+                        for (var p = 0; p < jpgList.length; p++) {
+                            var currentJpg = jpgList[p];
+                            var currentFileName = currentJpg.displayName;
+                            var index = currentFileName.lastIndexOf(".");
+                            var ext = currentFileName.substr(index + 1);
+                            var currentFileStem = currentFileName.split('.').slice(0, -1).join('.');
+                            if (!pLettered.test(currentFileStem)) {
+                                bgFileList.push(currentJpg);
+                            }
                         }
-                    }
-                    if (psdList.length > 0) {
-                        inputType = 'psd';
-                        bgFileList = psdList;
-                    }
-                    if (bgFileList.length === bubbles.length && bgFileList.length > 0) {
-                        processFolderPic(folderPath, bgFileList, bubbles, inputType);
-                    } else {
-                        alert('图片张数：' + bgFileList.length + '\r' + '文稿页数：' + bubbles.length)
-                    }
-                } else
-                    logList.push('未找到填字文档：' + currentFolderName);
+                        if (psdList.length > 0) {
+                            inputType = 'psd';
+                            bgFileList = psdList;
+                        }
+                        if (bgFileList.length === bubbles.length && bgFileList.length > 0) {
+                            processFolderPic(folderPath, bgFileList, bubbles, inputType, mode);
+                        } else {
+                            alert('图片张数：' + bgFileList.length + '\r' + '文稿页数：' + bubbles.length)
+                        }
+                    } else
+                        logList.push('未找到填字文档：' + currentFolderName);
+                }
             }
         }
     }
