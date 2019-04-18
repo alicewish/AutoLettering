@@ -197,11 +197,12 @@ var pIgnore = new RegExp("( copy|-|填字)$", "g");
 var pLettered = new RegExp("(填字|加框| copy| 拷贝|Whiten)$", "g");
 var pPage = new RegExp("^(## |)\\d{1,4}$", "g");
 
-var pCoorColor = new RegExp("^\\d{1,5},\\d{1,5},\\d{1,3},\\d{1,3},\\d{1,3}$", "g");
-var pCoor = new RegExp("^\\d{1,5},\\d{1,5}$", "g");
-var pColor = new RegExp("^\\d{1,3},\\d{1,3},\\d{1,3}$", "g");
-var pMeta = new RegExp("^(\\d{1,5},\\d{1,5},\\d{1,3},\\d{1,3},\\d{1,3}|\\d{1,5},\\d{1,5}|\\d{1,3},\\d{1,3},\\d{1,3})$", "g");
+var pCoorColor = new RegExp("^\\d{1,5},\\d{1,5},\\d{1,3},\\d{1,3},\\d{1,3}", "g");
+var pCoor = new RegExp("^\\d{1,5},\\d{1,5}", "g");
+var pColor = new RegExp("^\\d{1,3},\\d{1,3},\\d{1,3}", "g");
+var pMeta = new RegExp("^(\\d{1,5},\\d{1,5},\\d{1,3},\\d{1,3},\\d{1,3}|\\d{1,5},\\d{1,5}|\\d{1,3},\\d{1,3},\\d{1,3})", "g");
 var pComment = new RegExp("^(\\*|译注)", "g");
+var pLeft = new RegExp("~L$", "g");
 
 
 var possibles = ['-7标记.md', '-7标记.txt', '.md', '.txt', '填字.md', '填字.txt', '-填字.md', '-填字.txt', '填.md', '填.txt', '-填.md', '-填.txt',];
@@ -243,13 +244,17 @@ app.preferences.pointSize = PointType.POSTSCRIPT;
  * @param {string} str
  * @returns {string}
  */
-function trim(str) {
-    return str.replace(/(^[\s\n\r\t\x0B]+)|([\s\n\r\t\x0B]+$)/g, '');
-}
+// function trim(str) {
+//     return str.replace(/(^[\s\n\r\t\x0B]+)|([\s\n\r\t\x0B]+$)/g, '');
+// }
+//
+// if (String.prototype.trim == null) String.prototype.trim = function () {
+//     return this.replace(/(^[\s\n\r\t\x0B]+)|([\s\n\r\t\x0B]+$)/g, '')
+// };
 
-if (String.prototype.trim == null) String.prototype.trim = function () {
-    return this.replace(/(^[\s\n\r\t\x0B]+)|([\s\n\r\t\x0B]+$)/g, '')
-};
+function trim(str) {
+    return str;
+}
 
 //================写入到文本================
 //并没有用到
@@ -444,6 +449,7 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType, mode) {
                 }
             }
 
+
             var textColor = new SolidColor();//定义字体颜色
             textColor.rgb.red = red;
             textColor.rgb.green = green;
@@ -500,6 +506,9 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType, mode) {
                 textItemRef.justification = Justification.LEFT; //对齐方式
                 textItemRef.size = 20; //字号
             }
+            if (pLeft.test(info_str)) {
+                textItemRef.justification = Justification.LEFT; //对齐方式
+            }
 
             // The position of origin for the text. The array members specify the X and Y coordinates.
             // Equivalent to clicking the text tool at a point in the document to create the point of origin for text.
@@ -514,7 +523,6 @@ function processFolderPic(folderPath, bgFileList, bubbles, inputType, mode) {
         //不保存关闭处理后的文件
         bgFile.close(SaveOptions.DONOTSAVECHANGES);
     }
-
 }
 
 //================主体程序================
